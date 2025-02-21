@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Result Page</title>
+    <!-- Add any other meta tags or stylesheets as needed -->
+
+    <!-- Include a Google Font for better typography -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap">
+
+    <style>
+        /* Style for the responsive button */
+        .responsive-button {
+            display: inline-block;
+            padding: 15px 30px;
+            font-size: 20px;
+            font-family: 'Roboto', sans-serif;
+            text-align: center;
+            text-decoration: none;
+            cursor: pointer;
+            background-color: #4caf50; /* Green color */
+            color: #ffffff; /* White text */
+            border-radius: 8px;
+            transition: background-color 0.3s ease-in-out;
+            margin-top: 20px;
+        }
+
+        /* Media query for responsiveness */
+        @media only screen and (max-width: 600px) {
+            .responsive-button {
+                font-size: 18px;
+                padding: 12px 24px;
+            }
+        }
+
+        /* Hover effect */
+        .responsive-button:hover {
+            background-color: #45a049; /* Darker green on hover */
+        }
+
+        /* Animation effect for results */
+        .result-item {
+            opacity: 0;
+            animation: fadeIn 1s forwards;
+            font-size: 24px;
+            font-weight: 700;
+            color: #333; /* Dark gray text color */
+            margin: 15px 0;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div style="text-align: center; margin-top: 50px;">
+        <h1 style="font-size: 36px; font-weight: 700; color: #333;">Result</h1>
+        <div id="results-container">
+            <!-- Results will be displayed here -->
+        </div>
+        
+        <a href="/" class="responsive-button">Go Back to Home</a>
+
+        <!-- You can include additional information or dynamically generated content here -->
+
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+ <script>
+    $(document).ready(function () {
+        // Make an AJAX request to the /get_results route
+        $.getJSON("/get_results", function (data) {
+            // Concatenate results into a sentence
+            var resultSentence = "You Choose " + data.result_0 +" " + "with " + data.result_1 + ", and  " + data.result_2 + " Quantity.";
+
+            // Update the content of the results container with animation
+            $("#results-container").html(
+                "<p class='result-item'>" + resultSentence + "</p>"
+            );
+        });
+    });
+</script>
+
+</body>
+</html>

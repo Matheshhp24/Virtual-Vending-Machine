@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vending Machine with Virtual Interface</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lobster&display=swap">
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        header {
+            background-color: #3498db; /* Attractive color for the header */
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-family: 'Lobster', cursive; /* Apply the Lobster font */
+        }
+
+        .container {
+            display: flex;
+            flex: 1;
+        }
+
+        .left-section {
+            flex: 1;
+            max-width: 50%;
+            overflow: hidden;
+            box-sizing: border-box;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            padding: 10px;
+        }
+
+        .right-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: #f4f4f4;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            border-radius: 8px;
+        }
+
+        .progress-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .progress-bar {
+            width: 300px;
+            height: 20px;
+            border: 1px solid #ccc;
+            margin-bottom: 10px;
+            overflow: hidden;
+        }
+
+        .filler {
+            height: 100%;
+            transition: width 0.3s ease-in-out;
+        }
+
+        #coffee-progress .filler {
+            background-color: #4caf50;
+        }
+
+        #tea-progress .filler {
+            background-color: #4caf50;
+        }
+
+        #milk-progress .filler {
+            background-color: #FF9800;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Vending Machine</h1>
+    </header>
+    <div>Tea Counter: {{ counter }}</div>
+
+    <div class="container">
+        <div class="left-section">
+            <!-- Include Flask templating syntax here, for example: -->
+             <img src="{{ url_for('video_feed') }}" alt="Camera Feed"> 
+        </div>
+
+        <div class="right-section">
+            <div class="progress-container">
+                <p>Coffee Progress</p>
+                <div id="coffee-progress" class="progress-bar">
+                    <div class="filler" id="coffee-filler"></div>
+                </div>
+            </div>
+            
+            <div class="progress-container">
+                <p>Tea Progress</p>
+                <div id="tea-progress" class="progress-bar">
+                    <div class="filler" id="tea-filler"></div>
+                </div>
+            </div>
+        
+            <div class="progress-container">
+                <p>Milk Progress</p>
+                <div id="milk-progress" class="progress-bar">
+                    <div class="filler" id="milk-filler"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <!-- Include jQuery -->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+
+    <!-- Include jQuery -->
+
+    <script>
+            // Flag variables
+            let coffee_flag = false;
+            let tea_flag = false;
+            let milk_flag = false;
+
+            // Previous values for tracking changes
+            let prevCoffeeFlag = false;
+            let prevTeaFlag = false;
+            let prevMilkFlag = false;
+
+            function updateProgressBars() {
+                // AJAX request to get the values of coffee_flag, tea_flag, and milk_flag
+                $.get('/get_flags_status', function(data) {
+                    coffee_flag = data.coffee_flag;
+                    tea_flag = data.tea_flag;
+                    milk_flag = data.milk_flag;
+        
+                    // Update progress bars
+                    updateProgressBar('coffee', coffee_flag);
+                    updateProgressBar('tea', tea_flag);
+                    updateProgressBar('milk', milk_flag);
+        
+                    // Handle flag changes
+                    handleFlagChange('coffee', prevCoffeeFlag, coffee_flag);
+                    handleFlagChange('tea', prevTeaFlag, tea_flag);
+                    handleFlagChange('milk', prevMilkFlag, milk_flag);
+        
+                    // Update previous flag values
+                    prevCoffeeFlag = coffee_flag;
+                    prevTeaFlag = tea_flag;
+                    prevMilkFlag = milk_flag;
+                });
+            }
+        
+            function updateProgressBar(flag, condition) {
+                let fillerElement = $(`#${flag}-filler`);
+                let width = condition ? '100%' : '0';
+                fillerElement.css('width', width);
+            }
+        
+            function handleFlagChange(flag, prevValue, newValue) {
+                if (prevValue !== newValue) {
+                    // If the flag has changed, reset the progress bar
+                    resetProgressBar(flag);
+                }
+            }
+        
+            function resetProgressBar(flag) {
+                let fillerElement = $(`#${flag}-filler`);
+                fillerElement.css('width', '0');
+            }
+        
+            // Periodically check for flag conditions and update progress bars
+            setInterval(updateProgressBars, 100);  // Check every 1000 milliseconds (1 second)
+    
+        // Existing script for redirection
+        function checkAndRedirect() {
+            // AJAX request to get the value of redirect_to_sugar
+            $.get('/get_redirect_status', function(data) {
+                if (data.redirect_to_sugar) {
+                    // Change the URL to the desired destination
+                    window.location.href = '/sugar';
+                }
+            });
+        }
+    
+        // Periodically check for redirection condition
+        setInterval(checkAndRedirect, 1000);  // Check every 1000 milliseconds (1 second)
+    </script>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+
+
+
+</body>
+</html>
